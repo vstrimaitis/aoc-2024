@@ -1,3 +1,6 @@
+# AoC authors ask for personal inputs to not be published
+inputs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
