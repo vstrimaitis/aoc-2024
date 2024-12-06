@@ -42,7 +42,7 @@ def solve(g, n, m):
                 curr = (i, j, g[i][j])
     assert curr is not None
 
-    seen = set()
+    seen = {curr}
     while True:
         curr = get_next(curr, g, n, m)
         if curr[-1] is None: # escaped
