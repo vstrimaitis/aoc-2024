@@ -76,6 +76,22 @@ def to_grid(s: str, cell_width: int = 1, h_spacing: int = 0) -> Tuple[List[List[
         ans.append(groups)
     return ans, len(ans), len(ans[0])
 
+def to_inf_grid(g: list[list[str]]) -> dict[complex, str]:
+    d = dict()
+    for i in range(len(g)):
+        for j in range(len(g[i])):
+            d[i+j*1j] = g[i][j]
+    return d
+
+def rot_cw(d: complex) -> complex:
+    return d * -1j
+
+def rot_ccw(d: complex) -> complex:
+    return d * 1j
+
+def to_coord(c: complex) -> tuple[int, int]:
+    return int(c.real), int(c.imag)
+
 def print_grid(grid: List[List[str]], sep: str = "") -> None:
     for line in grid:
         print(*line, sep=sep)
