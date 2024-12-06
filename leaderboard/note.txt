@@ -1,0 +1,8 @@
+Here be dragons.
+
+I hacked this together in the quickest and dirtiest way possible, so don't look :D I might clean up later.
+
+To plot:
+1. python scrape.py
+2. python calc_scores.py
+3. python plot.py

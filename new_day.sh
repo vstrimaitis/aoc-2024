@@ -38,6 +38,7 @@ cp -r $PYTHON_TEMPLATE_FOLDER $PYTHON_TARGET_FOLDER
 
 for filename in $PYTHON_TARGET_FOLDER/*; do
     tmpfile=$(mktemp)
+    cp $filename $tmpfile
     envsubst < $filename > $tmpfile
     mv $tmpfile $filename
 done
