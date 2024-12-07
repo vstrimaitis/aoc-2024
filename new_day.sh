@@ -39,6 +39,7 @@ cp -r $PYTHON_TEMPLATE_FOLDER $PYTHON_TARGET_FOLDER
 for filename in $PYTHON_TARGET_FOLDER/*; do
     tmpfile=$(mktemp)
     cp $filename $tmpfile
+    chmod "$(stat -f '%p' $filename | cut -c 4-)" $tmpfile  # make sure file permissions are kept
     envsubst < $filename > $tmpfile
     mv $tmpfile $filename
 done
