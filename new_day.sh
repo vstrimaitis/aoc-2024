@@ -27,7 +27,7 @@ PYTHON_TARGET_FOLDER="python/$DAY_FORMATTED"
 PYTHON_TEMPLATE_FOLDER="$TEMPLATES_FOLDER/python"
 
 if [[ -d $PYTHON_TARGET_FOLDER ]] ; then
-    read -p "Directory $PYTHON_TARGET_FOLDER already exists. Overwrite? (y/n) " yn
+    read -r -p "Directory $PYTHON_TARGET_FOLDER already exists. Overwrite? (y/n) " yn
     case $yn in
         [Yy]* ) rm -rf "$PYTHON_TARGET_FOLDER";;
         * ) echo "Exiting"; exit 0;;
