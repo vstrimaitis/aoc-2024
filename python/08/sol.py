@@ -8,25 +8,21 @@ import itertools as itt
 import functools as ft
 
 
-def calc(n: int, m: int, ants: list[CCoord], mults: list[int] | None) -> set[CCoord]:
+def calc(n: int, m: int, c1: CCoord, c2: CCoord, mults: list[int] | None) -> set[CCoord]:
     res: set[CCoord] = set()
-    for c1 in ants:
-        for c2 in ants:
-            if c1 == c2:
-                continue
-            d = c2 - c1
-            if mults is None:
-                curr = c1
-                while is_within_bounds(curr, n, m):
-                    res.add(curr)
-                    curr += d
-                curr = c1
-                while is_within_bounds(curr, n, m):
-                    res.add(curr)
-                    curr -= d
-            else:
-                for mult in mults:
-                    res.add(c1 + mult * d)
+    d = c2 - c1
+    if mults is None:
+        curr = c1
+        while is_within_bounds(curr, n, m):
+            res.add(curr)
+            curr += d
+        curr = c1
+        while is_within_bounds(curr, n, m):
+            res.add(curr)
+            curr -= d
+    else:
+        for mult in mults:
+            res.add(c1 + mult * d)
     return {c for c in res if is_within_bounds(c, n, m)}
 
 
@@ -38,10 +34,21 @@ with PuzzleContext(year=2024, day=8) as ctx:
         if val != ".":
             poss[val].append(c)
 
+    pairs = [
+        (a1, a2)
+        for antennas in poss.values()
+        for a1 in antennas
+        for a2 in antennas
+        if a1 != a2
+    ]
+
     ans1 = len(
         ft.reduce(
             lambda acc, s: acc | s,
-            [calc(n, m, antennas, mults=[-1, 2]) for antennas in poss.values()],
+            [
+                calc(n, m, a1, a2, mults=[-1, 2])
+                for a1, a2 in pairs
+            ],
             set(),
         )
     )
@@ -50,7 +57,10 @@ with PuzzleContext(year=2024, day=8) as ctx:
     ans2 = len(
         ft.reduce(
             lambda acc, s: acc | s,
-            [calc(n, m, antennas, mults=None) for antennas in poss.values()],
+            [
+                calc(n, m, a1, a2, mults=None)
+                for a1, a2 in pairs
+            ],
             set(),
         )
     )
