@@ -12,42 +12,9 @@ Grid = list[list[str]]
 Coord = tuple[int, int]
 Dir = tuple[int, int]
 
-def can_move(g: Grid, p: Coord, d: Dir) -> bool:
-    i, j = p
-    if g[i][j] == "#":
-        return False
-    if g[i][j] == ".":
-        return True
-    di, dj = d
-    ii = i+di
-    jj = j+dj
-    if g[i][j] in {"O", "@"}:
-        return can_move(g, (ii, jj), d)
-    if g[i][j] in {"[", "]"}:
-        if g[i][j] == "[":
-            pair_coord = (i, j+1)
-            assert lget(g, pair_coord) == "]"
-        else:
-            pair_coord = (i, j-1)
-            assert lget(g, pair_coord) == "["
-        
-        if (ii, jj) == pair_coord:
-            to_check = [(ii+di, jj+dj)]
-        elif di == 0:
-            to_check = [(ii, jj)]
-        else:
-            to_check = [(ii, jj), (pair_coord[0]+di, pair_coord[1]+dj)]
-
-        for pp in to_check:
-            if not can_move(g, pp, d):
-                return False
-        return True
-    assert False
-
-
-def move_double(g: Grid, p1: Coord, p2: Coord, d: Dir) -> tuple[Coord, Coord]:
+def move_double(g: Grid, p1: Coord, p2: Coord, d: Dir, check_only: bool) -> tuple[Coord, Coord]:
     if lget(g, p1) != "[":
-        nxt2, nxt1 = move_double(g, p2, p1, d)
+        nxt2, nxt1 = move_double(g, p2, p1, d, check_only)
         return nxt1, nxt2
     assert lget(g, p1) == "["
     assert lget(g, p2) == "]"
@@ -58,39 +25,58 @@ def move_double(g: Grid, p1: Coord, p2: Coord, d: Dir) -> tuple[Coord, Coord]:
     nxt1 = i1+di, j1+dj
     nxt2 = i2+di, j2+dj
     
-    if d == (0, -1):
-        move(g, nxt1, d)
-    elif d == (0, 1):
-        move(g, nxt2, d)
-    else:
-        move(g, nxt1, d)
-        move(g, nxt2, d)
-    lset(g, p1, ".")
-    lset(g, p2, ".")
-    lset(g, nxt1, "[")
-    lset(g, nxt2, "]")
+    def do_single_moves(check: bool):
+        """Checks whether a move is possible and performs it if `check` is True"""
+        if d == (0, -1):
+            # going left - only need to check whether '[' can move
+            if move(g, nxt1, d, check) != nxt1:
+                return True
+            return False
+        elif d == (0, 1):
+            # going right - only need to check whether ']' can move
+            if move(g, nxt2, d, check) != nxt2:
+                return True
+            return False
+        else:
+            # going up or down - need to check if both can move
+            if move(g, nxt1, d, check) != nxt1 and move(g, nxt2, d, check) != nxt2:
+                return True
+            return False
+    # first, check if a move can be performed without actually doing it
+    can_move = do_single_moves(True)
+    if not can_move:
+        return p1, p2
+    # if everything is ok - perform the move
+    do_single_moves(check_only)
+    if not check_only:
+        lset(g, p1, ".")
+        lset(g, p2, ".")
+        lset(g, nxt1, "[")
+        lset(g, nxt2, "]")
     return nxt1, nxt2
 
-def move(g: Grid, p: Coord, d: Dir) -> Coord:
-    if not can_move(g, p, d):
-        return p
+def move(g: Grid, p: Coord, d: Dir, check_only: bool = False) -> Coord:
     i, j = p
+    if g[i][j] == "#":
+        return (i, j)
     di, dj = d
-    ii = i+di
-    jj = j+dj
+    ii, jj = i+di, j+dj
     if g[i][j] == ".":
         return (ii, jj)
     if g[i][j] in {"O", "@"}:
-        move(g, (ii, jj), d)
-        g[ii][jj] = g[i][j]
-        g[i][j] = "."
+        nxt = move(g, (ii, jj), d, check_only)
+        if nxt == (ii, jj):
+            return p
+        if not check_only:
+            g[ii][jj] = g[i][j]
+            g[i][j] = "."
         return ii, jj
     elif g[i][j] in {"[", "]"}:
         if g[i][j] == "[":
-            return move_double(g, (i, j), (i, j+1), d)[0]
+            return move_double(g, (i, j), (i, j+1), d, check_only)[0]
         else:
-            return move_double(g, (i, j), (i, j-1), d)[0]
-    return (i, j)
+            return move_double(g, (i, j), (i, j-1), d, check_only)[0]
+    assert False, "should never happen"
 
 def parse_dir(s: str) -> Dir:
     return {
