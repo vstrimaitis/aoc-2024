@@ -123,13 +123,11 @@ DIRS_4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 DIRS_8 = [(1, 1), (-1, -1), (1, -1), (-1, 1)] + DIRS_4
 def get_neigh_coords(grid: List[List[Any]], i: int, j: int, dirs: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     n, m = len(grid), len(grid[0])
-    ans = []
     for di, dj in dirs:
         ii = i + di
         jj = j + dj
         if 0 <= ii < n and 0 <= jj < m:
-            ans.append((ii, jj))
-    return ans
+            yield (ii, jj)
 
 def get_neighs(grid: List[List[T]], i: int, j: int, dirs: List[Tuple[int, int]], fill=None) -> List[T]:
     n, m = len(grid), len(grid[0])
