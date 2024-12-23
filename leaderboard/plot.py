@@ -123,7 +123,7 @@ if __name__ == "__main__":
             ),
             PAST_KEYS[2022]: Highlight(
                 text="2022 result",
-                color="lightgray"
+                color="gray"
             ),
         },
         goal_position=50,
